@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 8,
     paddingBottom: 12,
-    backgroundColor: "#f3f4f6",
+    backgroundColor: "#0B1C3D",
   },
   searchPill: {
     height: 52,
@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   filterChipActive: {
-    backgroundColor: "#111827",
+    backgroundColor: "#0B1C3D",
     borderColor: "#111827",
   },
   filterChipText: {
