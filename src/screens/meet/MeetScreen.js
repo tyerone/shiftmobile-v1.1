@@ -156,6 +156,7 @@ const styles = StyleSheet.create({
   },
   filtersRow: {
     paddingHorizontal: 8,
+    paddingTop:5,
     paddingBottom: 4,
     backgroundColor: "#fff",
   },
