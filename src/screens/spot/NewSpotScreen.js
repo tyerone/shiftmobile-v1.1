@@ -1,6 +1,6 @@
 // src/screens/spot/NewSpotScreen.js
-import "react-native-get-random-values"
-import React, { useState, useEffect } from "react"
+import "react-native-get-random-values";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -9,93 +9,93 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
-  ActivityIndicator
-} from "react-native"
-import { SafeAreaView } from "react-native-safe-area-context"
-import { useRoute, useNavigation } from "@react-navigation/native"
-import * as FileSystem from "expo-file-system/legacy"
-import { v4 as uuidv4 } from "uuid"
-import { useAuth } from "../../utils/AuthContext"
-import { db, storage } from "../../utils/firebaseConfig"
+  ActivityIndicator,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useRoute, useNavigation } from "@react-navigation/native";
+import * as FileSystem from "expo-file-system/legacy";
+import { v4 as uuidv4 } from "uuid";
+import { useAuth } from "../../utils/AuthContext";
+import { db, storage } from "../../utils/firebaseConfig";
 import {
   doc,
   setDoc,
   getDoc,
   serverTimestamp,
   increment,
-  arrayUnion
-} from "firebase/firestore"
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage"
+  arrayUnion,
+} from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
-const BACKEND_URL = "http://192.168.1.92:4000/analyze-spot"
+const BACKEND_URL = "http://192.168.1.92:4000/analyze-spot";
 
 export default function NewSpotScreen() {
-  const route = useRoute()
-  const navigation = useNavigation()
-  const { user } = useAuth()
-  const { photoUri } = route.params || {}
+  const route = useRoute();
+  const navigation = useNavigation();
+  const { user } = useAuth();
+  const { photoUri } = route.params || {};
 
-  const [tags, setTags] = useState([])
-  const [analysisInfo, setAnalysisInfo] = useState(null)
-  const [analyzing, setAnalyzing] = useState(false)
-  const [uploading, setUploading] = useState(false)
+  const [tags, setTags] = useState([]);
+  const [analysisInfo, setAnalysisInfo] = useState(null);
+  const [analyzing, setAnalyzing] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (photoUri) {
-      analyzeImage()
+      analyzeImage();
     }
-  }, [photoUri])
+  }, [photoUri]);
 
   async function analyzeImage() {
     try {
-      setAnalyzing(true)
+      setAnalyzing(true);
 
       const base64 = await FileSystem.readAsStringAsync(photoUri, {
-        encoding: "base64"
-      })
+        encoding: "base64",
+      });
 
       if (!base64) {
-        console.log("ANALYZE ERROR: empty base64 from FileSystem")
-        return
+        console.log("ANALYZE ERROR: empty base64 from FileSystem");
+        return;
       }
 
-      console.log("SENDING TO BACKEND")
+      console.log("SENDING TO BACKEND");
       const res = await fetch(BACKEND_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ image: base64 })
-      })
+        body: JSON.stringify({ image: base64 }),
+      });
 
-      const json = await res.json()
-      console.log("BACKEND RESPONSE:", json)
+      const json = await res.json();
+      console.log("BACKEND RESPONSE:", json);
 
       if (json.error) {
-        console.log("ANALYZE ERROR:", json.error)
-        return
+        console.log("ANALYZE ERROR:", json.error);
+        return;
       }
 
-      setTags(Array.isArray(json.tags) ? json.tags : [])
-      setAnalysisInfo(json)
+      setTags(Array.isArray(json.tags) ? json.tags : []);
+      setAnalysisInfo(json);
     } catch (err) {
-      console.log("ANALYZE ERROR:", err)
+      console.log("ANALYZE ERROR:", err);
     } finally {
-      setAnalyzing(false)
+      setAnalyzing(false);
     }
   }
 
   function handleCancel() {
-    navigation.goBack()
+    navigation.goBack();
   }
 
   async function handleShare() {
     if (!user) {
-      Alert.alert("Not logged in", "You must be logged in to do that!")
-      return
+      Alert.alert("Not logged in", "You must be logged in to do that!");
+      return;
     }
 
     if (!photoUri) {
-      Alert.alert("No photo", "Take a photo first.")
-      return
+      Alert.alert("No photo", "Take a photo first.");
+      return;
     }
 
     // NEW: block share if analysis not done yet
@@ -103,8 +103,8 @@ export default function NewSpotScreen() {
       Alert.alert(
         "Please wait",
         "Photo analysis is still running. Wait for tags to appear."
-      )
-      return
+      );
+      return;
     }
 
     // NEW: block share if this is not a vehicle
@@ -112,35 +112,35 @@ export default function NewSpotScreen() {
       Alert.alert(
         "Not a car",
         "This photo does not appear to be a vehicle. Retake the photo and try again."
-      )
-      return
+      );
+      return;
     }
 
     try {
-      setUploading(true)
+      setUploading(true);
 
-      let username = user.displayName || user.email?.split("@")[0] || "Unknown"
+      let username = user.displayName || user.email?.split("@")[0] || "Unknown";
       try {
-        const userRef = doc(db, "users", user.uid)
-        const snap = await getDoc(userRef)
+        const userRef = doc(db, "users", user.uid);
+        const snap = await getDoc(userRef);
         if (snap.exists()) {
-          const data = snap.data()
+          const data = snap.data();
           if (data.username) {
-            username = data.username
+            username = data.username;
           }
         }
       } catch (err) {
-        console.log("username fetch error", err)
+        console.log("username fetch error", err);
       }
 
-      const spotId = uuidv4()
+      const spotId = uuidv4();
 
-      const response = await fetch(photoUri)
-      const blob = await response.blob()
+      const response = await fetch(photoUri);
+      const blob = await response.blob();
 
-      const imageRef = ref(storage, `spots/${user.uid}/${spotId}.jpg`)
-      await uploadBytes(imageRef, blob)
-      const downloadUrl = await getDownloadURL(imageRef)
+      const imageRef = ref(storage, `spots/${user.uid}/${spotId}.jpg`);
+      await uploadBytes(imageRef, blob);
+      const downloadUrl = await getDownloadURL(imageRef);
 
       const payload = {
         uid: user.uid,
@@ -152,28 +152,28 @@ export default function NewSpotScreen() {
         brand: analysisInfo?.brand ?? null,
         modelGuess: analysisInfo?.modelGuess ?? null,
         modLevel: analysisInfo?.modLevel ?? null,
-        createdAt: serverTimestamp()
-      }
+        createdAt: serverTimestamp(),
+      };
 
-      await setDoc(doc(db, "spots", spotId), payload)
+      await setDoc(doc(db, "spots", spotId), payload);
 
-      const userRef = doc(db, "users", user.uid)
+      const userRef = doc(db, "users", user.uid);
       await setDoc(
         userRef,
         {
           spotsCount: increment(1),
-          spots: arrayUnion(spotId)
+          spots: arrayUnion(spotId),
         },
         { merge: true }
-      )
+      );
 
-      Alert.alert("Shared", "Your spot is live.")
-      navigation.goBack()
+      Alert.alert("Shared", "Your spot is live.");
+      navigation.goBack();
     } catch (err) {
-      console.log("UPLOAD ERROR:", err)
-      Alert.alert("Error", "Upload failed")
+      console.log("UPLOAD ERROR:", err);
+      Alert.alert("Error", "Upload failed");
     } finally {
-      setUploading(false)
+      setUploading(false);
     }
   }
 
@@ -225,7 +225,7 @@ export default function NewSpotScreen() {
             </View>
           ) : (
             <View style={styles.tagsRow}>
-              {tags.map(tag => (
+              {tags.map((tag) => (
                 <View key={tag} style={styles.tagPill}>
                   <Text style={styles.tagText}>{tag}</Text>
                 </View>
@@ -235,13 +235,13 @@ export default function NewSpotScreen() {
         </View>
       </ScrollView>
     </SafeAreaView>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: "#fff"
+    backgroundColor: "#fff",
   },
   header: {
     flexDirection: "row",
@@ -249,52 +249,52 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 10,
     borderBottomWidth: 0.5,
-    borderBottomColor: "#e5e7eb"
+    borderBottomColor: "#e5e7eb",
   },
   headerButton: {
     fontSize: 15,
     color: "#2563eb",
-    fontWeight: "600"
+    fontWeight: "600",
   },
   headerTitle: {
     flex: 1,
     textAlign: "center",
     fontSize: 16,
-    fontWeight: "600"
+    fontWeight: "600",
   },
   scroll: {
-    flex: 1
+    flex: 1,
   },
   scrollContent: {
-    paddingBottom: 24
+    paddingBottom: 24,
   },
   previewWrap: {
     width: "100%",
-    backgroundColor: "#000"
+    backgroundColor: "#000",
   },
   previewLarge: {
     width: "100%",
-    aspectRatio: 3 / 4
+    aspectRatio: 3 / 4,
   },
   previewPlaceholder: {
     width: "100%",
     aspectRatio: 3 / 4,
-    backgroundColor: "#e5e7eb"
+    backgroundColor: "#e5e7eb",
   },
   section: {
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderTopWidth: 0.5,
-    borderTopColor: "#e5e7eb"
+    borderTopColor: "#e5e7eb",
   },
   sectionLabel: {
     fontSize: 14,
     fontWeight: "600",
-    marginBottom: 6
+    marginBottom: 6,
   },
   tagsRow: {
     flexDirection: "row",
-    flexWrap: "wrap"
+    flexWrap: "wrap",
   },
   tagPill: {
     paddingHorizontal: 16,
@@ -302,19 +302,19 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     backgroundColor: "#e5e7eb",
     marginRight: 8,
-    marginBottom: 6
+    marginBottom: 6,
   },
   tagText: {
     fontSize: 13,
-    color: "#4b5563"
+    color: "#4b5563",
   },
   tagsLoadingRow: {
     flexDirection: "row",
-    alignItems: "center"
+    alignItems: "center",
   },
   tagsLoadingText: {
     marginLeft: 8,
     fontSize: 13,
-    color: "#6b7280"
-  }
-})
+    color: "#6b7280",
+  },
+});

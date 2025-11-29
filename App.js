@@ -1,31 +1,31 @@
-import React from "react"
-import { NavigationContainer } from "@react-navigation/native"
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
-import { createNativeStackNavigator } from "@react-navigation/native-stack"
-import { Ionicons } from "@expo/vector-icons"
+import React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { Ionicons } from "@expo/vector-icons";
 
-import MeetScreen from "./src/screens/meet/MeetScreen"
-import MeetSearchScreen from "./src/screens/meet/MeetSearchScreen"
-import MeetResultsScreen from "./src/screens/meet/MeetResultsScreen"
+import MeetScreen from "./src/screens/meet/MeetScreen";
+import MeetSearchScreen from "./src/screens/meet/MeetSearchScreen";
+import MeetResultsScreen from "./src/screens/meet/MeetResultsScreen";
 
-import SpotScreen from "./src/screens/spot/SpotScreen"
-import CreateSpotCameraScreen from "./src/screens/spot/CreateSpotCameraScreen"
-import NewSpotScreen from "./src/screens/spot/NewSpotScreen"
+import SpotScreen from "./src/screens/spot/SpotScreen";
+import CreateSpotCameraScreen from "./src/screens/spot/CreateSpotCameraScreen";
+import NewSpotScreen from "./src/screens/spot/NewSpotScreen";
 
-import BuildScreen from "./src/screens/BuildScreen"
+import BuildScreen from "./src/screens/BuildScreen";
 
-import ProfileGate from "./src/screens/profile/ProfileGate"
-import EditProfileScreen from "./src/screens/profile/EditProfileScreen"
-import SettingsScreen from "./src/screens/profile/SettingsScreen"
+import ProfileGate from "./src/screens/profile/ProfileGate";
+import EditProfileScreen from "./src/screens/profile/EditProfileScreen";
+import SettingsScreen from "./src/screens/profile/SettingsScreen";
 
-import { AuthProvider } from "./src/utils/AuthContext"
-import { ThemeProvider, useTheme } from "./src/utils/ThemeContext"
+import { AuthProvider } from "./src/utils/AuthContext";
+import { ThemeProvider, useTheme } from "./src/utils/ThemeContext";
 
-const Tab = createBottomTabNavigator()
-const Stack = createNativeStackNavigator()
+const Tab = createBottomTabNavigator();
+const Stack = createNativeStackNavigator();
 
 function MainTabs() {
-  const { theme } = useTheme()
+  const { theme } = useTheme();
 
   return (
     <Tab.Navigator
@@ -40,25 +40,25 @@ function MainTabs() {
           elevation: 0,
           height: 70,
           paddingBottom: 10,
-          paddingTop: 10
+          paddingTop: 10,
         },
         tabBarIcon: ({ focused }) => {
-          let iconName = "ellipse"
+          let iconName = "ellipse";
 
-          if (route.name === "Meet") iconName = "location"
-          if (route.name === "SpotStack") iconName = "eye"
-          if (route.name === "Build") iconName = "construct"
-          if (route.name === "ProfileTab") iconName = "person"
+          if (route.name === "Meet") iconName = "location";
+          if (route.name === "SpotStack") iconName = "eye";
+          if (route.name === "Build") iconName = "construct";
+          if (route.name === "ProfileTab") iconName = "person";
 
           const color =
             focused && theme === "dark"
               ? "#ffffff"
               : focused
               ? "#000000"
-              : "#8e8e8e"
+              : "#8e8e8e";
 
-          return <Ionicons name={iconName} size={26} color={color} />
-        }
+          return <Ionicons name={iconName} size={26} color={color} />;
+        },
       })}
     >
       <Tab.Screen name="Meet" component={MeetScreen} />
@@ -74,7 +74,7 @@ function MainTabs() {
         options={{ headerShown: false }}
       />
     </Tab.Navigator>
-  )
+  );
 }
 
 export default function App() {
@@ -90,7 +90,7 @@ export default function App() {
                 headerShown: false,
                 title: "",
                 headerBackTitle: "",
-                headerBackTitleVisible: false
+                headerBackTitleVisible: false,
               }}
             />
 
@@ -101,7 +101,7 @@ export default function App() {
               options={{
                 headerShown: false,
                 presentation: "transparentModal",
-                animation: "fade"
+                animation: "fade",
               }}
             />
 
@@ -110,7 +110,7 @@ export default function App() {
               name="MeetResults"
               component={MeetResultsScreen}
               options={{
-                headerShown: false
+                headerShown: false,
               }}
             />
 
@@ -119,14 +119,14 @@ export default function App() {
               name="CreateSpotCamera"
               component={CreateSpotCameraScreen}
               options={{
-                headerShown: false
+                headerShown: false,
               }}
             />
             <Stack.Screen
               name="NewSpot"
               component={NewSpotScreen}
               options={{
-                headerShown: false
+                headerShown: false,
               }}
             />
 
@@ -137,7 +137,7 @@ export default function App() {
               options={{
                 title: "Edit profile",
                 headerBackTitle: "",
-                headerBackTitleVisible: false
+                headerBackTitleVisible: false,
               }}
             />
             <Stack.Screen
@@ -146,12 +146,12 @@ export default function App() {
               options={{
                 title: "Settings",
                 headerBackTitle: "",
-                headerBackTitleVisible: false
+                headerBackTitleVisible: false,
               }}
             />
           </Stack.Navigator>
         </NavigationContainer>
       </ThemeProvider>
     </AuthProvider>
-  )
+  );
 }

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -6,69 +6,69 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  ActivityIndicator
-} from "react-native"
-import { SafeAreaView } from "react-native-safe-area-context"
-import { useNavigation } from "@react-navigation/native"
-import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore"
-import { db } from "../../utils/firebaseConfig"
-import { useAuth } from "../../utils/AuthContext"
+  ActivityIndicator,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useNavigation } from "@react-navigation/native";
+import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "../../utils/firebaseConfig";
+import { useAuth } from "../../utils/AuthContext";
 
 export default function EditProfileScreen() {
-  const navigation = useNavigation()
-  const { user } = useAuth()
+  const navigation = useNavigation();
+  const { user } = useAuth();
 
-  const [name, setName] = useState("")
-  const [username, setUsername] = useState("")
-  const [website, setWebsite] = useState("")
-  const [bio, setBio] = useState("")
-  const [email, setEmail] = useState("")
+  const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
+  const [website, setWebsite] = useState("");
+  const [bio, setBio] = useState("");
+  const [email, setEmail] = useState("");
 
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     async function loadProfile() {
       if (!user) {
-        setLoading(false)
-        return
+        setLoading(false);
+        return;
       }
 
       try {
-        const ref = doc(db, "users", user.uid)
-        const snap = await getDoc(ref)
+        const ref = doc(db, "users", user.uid);
+        const snap = await getDoc(ref);
 
         if (snap.exists()) {
-          const data = snap.data()
-          setName(data.name || "")
-          setUsername(data.username || "")
-          setWebsite(data.website || "")
-          setBio(data.bio || "")
-          setEmail(data.email || user.email || "")
+          const data = snap.data();
+          setName(data.name || "");
+          setUsername(data.username || "");
+          setWebsite(data.website || "");
+          setBio(data.bio || "");
+          setEmail(data.email || user.email || "");
         } else {
-          setName(user.displayName || "")
-          setUsername("")
-          setWebsite("")
-          setBio("")
-          setEmail(user.email || "")
+          setName(user.displayName || "");
+          setUsername("");
+          setWebsite("");
+          setBio("");
+          setEmail(user.email || "");
         }
       } catch (err) {
-        console.log("load profile error", err)
+        console.log("load profile error", err);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     }
 
-    loadProfile()
-  }, [user])
+    loadProfile();
+  }, [user]);
 
   async function handleSave() {
-    if (!user) return
+    if (!user) return;
 
     try {
-      setSaving(true)
+      setSaving(true);
 
-      const ref = doc(db, "users", user.uid)
+      const ref = doc(db, "users", user.uid);
 
       await setDoc(
         ref,
@@ -78,15 +78,15 @@ export default function EditProfileScreen() {
           website: website.trim(),
           bio: bio.trim(),
           email: email.trim(),
-          updatedAt: serverTimestamp()
+          updatedAt: serverTimestamp(),
         },
         { merge: true }
-      )
+      );
 
-      navigation.goBack()
+      navigation.goBack();
     } catch (err) {
-      console.log("save profile error", err)
-      setSaving(false)
+      console.log("save profile error", err);
+      setSaving(false);
     }
   }
 
@@ -97,7 +97,7 @@ export default function EditProfileScreen() {
           <ActivityIndicator />
         </View>
       </SafeAreaView>
-    )
+    );
   }
 
   return (
@@ -191,88 +191,88 @@ export default function EditProfileScreen() {
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: "#fff"
+    backgroundColor: "#fff",
   },
   scroll: {
-    flex: 1
+    flex: 1,
   },
   scrollContent: {
     paddingHorizontal: 16,
     paddingTop: 12,
-    paddingBottom: 24
+    paddingBottom: 24,
   },
   loadingWrap: {
     flex: 1,
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
   },
   photoSection: {
     alignItems: "center",
-    marginBottom: 24
+    marginBottom: 24,
   },
   avatar: {
     width: 96,
     height: 96,
     borderRadius: 48,
     backgroundColor: "#e5e7eb",
-    marginBottom: 8
+    marginBottom: 8,
   },
   changePhotoText: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#3b82f6"
+    color: "#3b82f6",
   },
   formSection: {
     borderTopWidth: 0.5,
     borderTopColor: "#e5e7eb",
-    paddingTop: 16
+    paddingTop: 16,
   },
   fieldBlock: {
-    marginBottom: 16
+    marginBottom: 16,
   },
   label: {
     fontSize: 12,
     color: "#6b7280",
-    marginBottom: 4
+    marginBottom: 4,
   },
   input: {
     borderBottomWidth: 0.5,
     borderBottomColor: "#d1d5db",
     paddingVertical: 8,
-    fontSize: 14
+    fontSize: 14,
   },
   bioInput: {
     height: 72,
-    textAlignVertical: "top"
+    textAlignVertical: "top",
   },
   sectionLabelWrap: {
     marginTop: 8,
-    marginBottom: 4
+    marginBottom: 4,
   },
   sectionLabel: {
     fontSize: 12,
     color: "#6b7280",
-    fontWeight: "600"
+    fontWeight: "600",
   },
   saveButton: {
     marginTop: 24,
     borderRadius: 8,
     backgroundColor: "#111827",
     paddingVertical: 12,
-    alignItems: "center"
+    alignItems: "center",
   },
   saveButtonDisabled: {
-    opacity: 0.7
+    opacity: 0.7,
   },
   saveButtonText: {
     color: "#fff",
     fontWeight: "600",
-    fontSize: 15
-  }
-})
+    fontSize: 15,
+  },
+});

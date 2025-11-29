@@ -1,25 +1,25 @@
-import React, { useRef, useState } from "react"
+import React, { useRef, useState } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
-  Image
-} from "react-native"
-import { SafeAreaView } from "react-native-safe-area-context"
-import { CameraView, useCameraPermissions } from "expo-camera"
-import { Ionicons } from "@expo/vector-icons"
-import { useNavigation } from "@react-navigation/native"
+  Image,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { CameraView, useCameraPermissions } from "expo-camera";
+import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 
 export default function CreateSpotCameraScreen() {
-  const navigation = useNavigation()
-  const cameraRef = useRef(null)
+  const navigation = useNavigation();
+  const cameraRef = useRef(null);
 
-  const [facing, setFacing] = useState("back")
-  const [permission, requestPermission] = useCameraPermissions()
-  const [capturing, setCapturing] = useState(false)
-  const [photoUri, setPhotoUri] = useState(null)
+  const [facing, setFacing] = useState("back");
+  const [permission, requestPermission] = useCameraPermissions();
+  const [capturing, setCapturing] = useState(false);
+  const [photoUri, setPhotoUri] = useState(null);
 
   if (!permission) {
     return (
@@ -28,7 +28,7 @@ export default function CreateSpotCameraScreen() {
           <ActivityIndicator />
         </View>
       </SafeAreaView>
-    )
+    );
   }
 
   if (!permission.granted) {
@@ -44,44 +44,44 @@ export default function CreateSpotCameraScreen() {
           </TouchableOpacity>
         </View>
       </SafeAreaView>
-    )
+    );
   }
 
   function toggleFacing() {
-    setFacing(current => (current === "back" ? "front" : "back"))
+    setFacing((current) => (current === "back" ? "front" : "back"));
   }
 
   async function handleTakePicture() {
-    if (!cameraRef.current || capturing) return
+    if (!cameraRef.current || capturing) return;
 
     try {
-      setCapturing(true)
+      setCapturing(true);
       const result = await cameraRef.current.takePictureAsync({
-        quality: 0.8
-      })
-      setPhotoUri(result?.uri ?? null)
+        quality: 0.8,
+      });
+      setPhotoUri(result?.uri ?? null);
     } catch (err) {
-      console.log("take picture error", err)
+      console.log("take picture error", err);
     } finally {
-      setCapturing(false)
+      setCapturing(false);
     }
   }
 
   function handleRetake() {
-    setPhotoUri(null)
+    setPhotoUri(null);
   }
 
   function handleCancel() {
     if (photoUri) {
-      setPhotoUri(null)
-      return
+      setPhotoUri(null);
+      return;
     }
-    navigation.goBack()
+    navigation.goBack();
   }
 
   function handleNext() {
-    if (!photoUri) return
-    navigation.navigate("NewSpot", { photoUri })
+    if (!photoUri) return;
+    navigation.navigate("NewSpot", { photoUri });
   }
 
   return (
@@ -101,11 +101,7 @@ export default function CreateSpotCameraScreen() {
           {photoUri ? (
             <Image source={{ uri: photoUri }} style={styles.preview} />
           ) : (
-            <CameraView
-              ref={cameraRef}
-              style={styles.camera}
-              facing={facing}
-            />
+            <CameraView ref={cameraRef} style={styles.camera} facing={facing} />
           )}
         </View>
 
@@ -149,62 +145,62 @@ export default function CreateSpotCameraScreen() {
         </View>
       </View>
     </SafeAreaView>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: "#000"
+    backgroundColor: "#000",
   },
   root: {
     flex: 1,
-    backgroundColor: "#000"
+    backgroundColor: "#000",
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 12,
     paddingTop: 4,
-    paddingBottom: 8
+    paddingBottom: 8,
   },
   headerIcon: {
     width: 40,
-    alignItems: "flex-start"
+    alignItems: "flex-start",
   },
   headerTitle: {
     flex: 1,
     textAlign: "center",
     color: "#fff",
     fontSize: 16,
-    fontWeight: "600"
+    fontWeight: "600",
   },
   cameraWrap: {
     flex: 1,
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
   },
   camera: {
     width: "100%",
-    aspectRatio: 3 / 4
+    aspectRatio: 3 / 4,
   },
   preview: {
     width: "100%",
-    aspectRatio: 3 / 4
+    aspectRatio: 3 / 4,
   },
   controls: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 32,
-    paddingVertical: 18
+    paddingVertical: 18,
   },
   smallButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
   },
   shutterOuter: {
     width: 72,
@@ -213,44 +209,44 @@ const styles = StyleSheet.create({
     borderWidth: 4,
     borderColor: "#fff",
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
   },
   shutterInner: {
     width: 52,
     height: 52,
     borderRadius: 26,
-    backgroundColor: "#fff"
+    backgroundColor: "#fff",
   },
   nextButton: {
     paddingHorizontal: 12,
-    paddingVertical: 8
+    paddingVertical: 8,
   },
   nextText: {
     color: "#fff",
     fontSize: 15,
-    fontWeight: "600"
+    fontWeight: "600",
   },
   center: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 24
+    paddingHorizontal: 24,
   },
   permissionTitle: {
     fontSize: 16,
     fontWeight: "600",
     marginBottom: 8,
-    color: "#fff"
+    color: "#fff",
   },
   permissionButton: {
     marginTop: 8,
     paddingHorizontal: 18,
     paddingVertical: 10,
     borderRadius: 8,
-    backgroundColor: "#111827"
+    backgroundColor: "#111827",
   },
   permissionButtonText: {
     color: "#fff",
-    fontWeight: "600"
-  }
-})
+    fontWeight: "600",
+  },
+});

@@ -1,31 +1,31 @@
-import React, { useMemo } from "react"
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native"
-import { SafeAreaView } from "react-native-safe-area-context"
-import MapView, { Marker } from "react-native-maps"
-import { Ionicons } from "@expo/vector-icons"
-import { useNavigation, useRoute } from "@react-navigation/native"
+import React, { useMemo } from "react";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import MapView, { Marker } from "react-native-maps";
+import { Ionicons } from "@expo/vector-icons";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 function formatDateRangeLabel(startDate, endDate) {
   if (startDate && endDate) {
-    const s = new Date(startDate)
-    const e = new Date(endDate)
+    const s = new Date(startDate);
+    const e = new Date(endDate);
     const sStr = s.toLocaleDateString("en-US", {
       month: "short",
-      day: "numeric"
-    })
+      day: "numeric",
+    });
     const eStr = e.toLocaleDateString("en-US", {
       month: "short",
-      day: "numeric"
-    })
-    return `${sStr} · ${eStr}`
+      day: "numeric",
+    });
+    return `${sStr} · ${eStr}`;
   }
-  return "Any week"
+  return "Any week";
 }
 
 // quick mock meets near the center
 function createMockMeets(center) {
-  const baseLat = center?.latitude ?? 49.2827
-  const baseLng = center?.longitude ?? -123.1207
+  const baseLat = center?.latitude ?? 49.2827;
+  const baseLng = center?.longitude ?? -123.1207;
 
   const offsets = [
     { dx: 0.01, dy: 0.0 },
@@ -33,48 +33,42 @@ function createMockMeets(center) {
     { dx: 0.006, dy: -0.005 },
     { dx: -0.012, dy: -0.006 },
     { dx: 0.002, dy: 0.007 },
-    { dx: -0.004, dy: -0.002 }
-  ]
+    { dx: -0.004, dy: -0.002 },
+  ];
 
   return offsets.map((o, index) => ({
     id: `meet-${index}`,
     title: `Meet ${index + 1}`,
     subtitle: "Car meet",
     latitude: baseLat + o.dy,
-    longitude: baseLng + o.dx
-  }))
+    longitude: baseLng + o.dx,
+  }));
 }
 
 export default function MeetResultsScreen() {
-  const navigation = useNavigation()
-  const route = useRoute()
+  const navigation = useNavigation();
+  const route = useRoute();
 
-  const {
-    locationTitle,
-    locationSubtitle,
-    center,
-    startDate,
-    endDate
-  } = route.params || {}
+  const { locationTitle, locationSubtitle, center, startDate, endDate } =
+    route.params || {};
 
   const region = useMemo(
     () => ({
       latitude: center?.latitude ?? 49.2827,
       longitude: center?.longitude ?? -123.1207,
       latitudeDelta: 0.08,
-      longitudeDelta: 0.08
+      longitudeDelta: 0.08,
     }),
     [center]
-  )
+  );
 
-  const meets = useMemo(() => createMockMeets(center), [center])
+  const meets = useMemo(() => createMockMeets(center), [center]);
 
-  const dateLabel = formatDateRangeLabel(startDate, endDate)
-  const headerTitle =
-    locationTitle || locationSubtitle || "Meets in this area"
+  const dateLabel = formatDateRangeLabel(startDate, endDate);
+  const headerTitle = locationTitle || locationSubtitle || "Meets in this area";
 
   function handleBack() {
-    navigation.goBack()
+    navigation.goBack();
   }
 
   function handleFilterPress() {
@@ -85,12 +79,12 @@ export default function MeetResultsScreen() {
     <SafeAreaView style={styles.safe} edges={["top"]}>
       <View style={styles.container}>
         <MapView style={styles.map} initialRegion={region}>
-          {meets.map(meet => (
+          {meets.map((meet) => (
             <Marker
               key={meet.id}
               coordinate={{
                 latitude: meet.latitude,
-                longitude: meet.longitude
+                longitude: meet.longitude,
               }}
             >
               <View style={styles.pricePill}>
@@ -107,10 +101,7 @@ export default function MeetResultsScreen() {
         {/* top pill header */}
         <View style={styles.topBarWrapper}>
           <View style={styles.topBarRow}>
-            <TouchableOpacity
-              style={styles.topBackButton}
-              onPress={handleBack}
-            >
+            <TouchableOpacity style={styles.topBackButton} onPress={handleBack}>
               <Ionicons name="arrow-back" size={20} color="#000" />
             </TouchableOpacity>
 
@@ -146,19 +137,19 @@ export default function MeetResultsScreen() {
         </View>
       </View>
     </SafeAreaView>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: "#ffffff"
+    backgroundColor: "#ffffff",
   },
   container: {
-    flex: 1
+    flex: 1,
   },
   map: {
-    flex: 1
+    flex: 1,
   },
 
   // light bar behind the pill, like Airbnb
@@ -173,7 +164,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 4 },
-    elevation: 4
+    elevation: 4,
   },
 
   topBarWrapper: {
@@ -182,13 +173,13 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     alignItems: "center",
-    paddingHorizontal: 12
+    paddingHorizontal: 12,
   },
   topBarRow: {
     flexDirection: "row",
     alignItems: "center",
     width: "100%",
-    justifyContent: "space-between"
+    justifyContent: "space-between",
   },
   topBackButton: {
     width: 36,
@@ -201,7 +192,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 4 },
-    elevation: 2
+    elevation: 2,
   },
   topPill: {
     flex: 1,
@@ -215,17 +206,17 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 4 },
     elevation: 3,
-    alignItems: "center"
+    alignItems: "center",
   },
   topTitle: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#111827"
+    color: "#111827",
   },
   topSubtitle: {
     fontSize: 13,
     color: "#6b7280",
-    marginTop: 2
+    marginTop: 2,
   },
 
   pricePill: {
@@ -239,19 +230,19 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.18,
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 2 },
-    elevation: 3
+    elevation: 3,
   },
   priceDot: {
     width: 8,
     height: 8,
     borderRadius: 4,
     backgroundColor: "#111827",
-    marginRight: 6
+    marginRight: 6,
   },
   priceText: {
     fontSize: 13,
     fontWeight: "600",
-    color: "#111827"
+    color: "#111827",
   },
 
   bottomSheet: {
@@ -269,7 +260,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.16,
     shadowRadius: 16,
     shadowOffset: { width: 0, height: -4 },
-    elevation: 8
+    elevation: 8,
   },
   bottomHandle: {
     alignSelf: "center",
@@ -277,16 +268,16 @@ const styles = StyleSheet.create({
     height: 4,
     borderRadius: 2,
     backgroundColor: "#d1d5db",
-    marginBottom: 8
+    marginBottom: 8,
   },
   bottomTitle: {
     fontSize: 18,
     fontWeight: "600",
     color: "#111827",
-    marginBottom: 2
+    marginBottom: 2,
   },
   bottomSubtitle: {
     fontSize: 14,
-    color: "#6b7280"
-  }
-})
+    color: "#6b7280",
+  },
+});

@@ -1,34 +1,34 @@
-import React, { useState } from "react"
+import React, { useState } from "react";
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet
-} from "react-native"
-import { SafeAreaView } from "react-native-safe-area-context"
+  StyleSheet,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
   signInWithEmailAndPassword,
-  createUserWithEmailAndPassword
-} from "firebase/auth"
-import { auth } from "../utils/firebaseConfig"
+  createUserWithEmailAndPassword,
+} from "firebase/auth";
+import { auth } from "../utils/firebaseConfig";
 
 export default function AuthScreen() {
-  const [mode, setMode] = useState("login")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [error, setError] = useState("")
+  const [mode, setMode] = useState("login");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   async function handleSubmit() {
-    setError("")
+    setError("");
     try {
       if (mode === "login") {
-        await signInWithEmailAndPassword(auth, email.trim(), password)
+        await signInWithEmailAndPassword(auth, email.trim(), password);
       } else {
-        await createUserWithEmailAndPassword(auth, email.trim(), password)
+        await createUserWithEmailAndPassword(auth, email.trim(), password);
       }
     } catch (err) {
-      setError(err.message)
+      setError(err.message);
     }
   }
 
@@ -69,7 +69,7 @@ export default function AuthScreen() {
         <TouchableOpacity
           style={styles.switchRow}
           onPress={() =>
-            setMode(prev => (prev === "login" ? "register" : "login"))
+            setMode((prev) => (prev === "login" ? "register" : "login"))
           }
         >
           <Text style={styles.switchText}>
@@ -80,7 +80,7 @@ export default function AuthScreen() {
         </TouchableOpacity>
       </View>
     </SafeAreaView>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -92,31 +92,31 @@ const styles = StyleSheet.create({
     borderBottomColor: "#d1d5db",
     paddingVertical: 10,
     fontSize: 14,
-    marginBottom: 20
+    marginBottom: 20,
   },
   button: {
     marginTop: 8,
     borderRadius: 8,
     backgroundColor: "#111827",
     paddingVertical: 12,
-    alignItems: "center"
+    alignItems: "center",
   },
   buttonText: {
     color: "#fff",
     fontWeight: "600",
-    fontSize: 15
+    fontSize: 15,
   },
   error: {
     color: "#ef4444",
     fontSize: 13,
-    marginBottom: 8
+    marginBottom: 8,
   },
   switchRow: {
     marginTop: 16,
-    alignItems: "center"
+    alignItems: "center",
   },
   switchText: {
     fontSize: 13,
-    color: "#2563eb"
-  }
-})
+    color: "#2563eb",
+  },
+});

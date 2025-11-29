@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -6,202 +6,207 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
-  ActivityIndicator
-} from "react-native"
+  ActivityIndicator,
+} from "react-native";
 import {
   SafeAreaView,
-  useSafeAreaInsets
-} from "react-native-safe-area-context"
-import { Ionicons } from "@expo/vector-icons"
-import { useNavigation } from "@react-navigation/native"
-import * as Location from "expo-location"
-import { Calendar } from "react-native-calendars"
-import { BlurView } from "expo-blur"
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import * as Location from "expo-location";
+import { Calendar } from "react-native-calendars";
+import { BlurView } from "expo-blur";
 
-const MAPBOX_TOKEN = "pk.eyJ1IjoidHllcm9uZSIsImEiOiJjbWh2aG9uYzEwYWJxMmtvazVrYnI1YzdsIn0.AUsVmUu5yaEIG8MGUBRAOQ"
+const MAPBOX_TOKEN =
+  "pk.eyJ1IjoidHllcm9uZSIsImEiOiJjbWh2aG9uYzEwYWJxMmtvazVrYnI1YzdsIn0.AUsVmUu5yaEIG8MGUBRAOQ";
 
 export default function MeetSearchScreen() {
-  const navigation = useNavigation()
-  const insets = useSafeAreaInsets()
+  const navigation = useNavigation();
+  const insets = useSafeAreaInsets();
 
-  const [query, setQuery] = useState("")
-  const [expandedWhere, setExpandedWhere] = useState(false)
+  const [query, setQuery] = useState("");
+  const [expandedWhere, setExpandedWhere] = useState(false);
 
-  const [coords, setCoords] = useState(null)
-  const [items, setItems] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [selectedLocation, setSelectedLocation] = useState(null)
+  const [coords, setCoords] = useState(null);
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState(null);
 
-  const [showCalendar, setShowCalendar] = useState(false)
-  const [startDate, setStartDate] = useState(null)
-  const [endDate, setEndDate] = useState(null)
-
-  useEffect(() => {
-    loadUserLocation()
-  }, [])
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
 
   useEffect(() => {
-    if (!coords) return
+    loadUserLocation();
+  }, []);
 
-    const trimmed = query.trim()
+  useEffect(() => {
+    if (!coords) return;
+
+    const trimmed = query.trim();
 
     if (!expandedWhere || trimmed.length < 2) {
-      loadNearby()
-      return
+      loadNearby();
+      return;
     }
 
-    searchPlaces(trimmed)
-  }, [coords, expandedWhere, query])
+    searchPlaces(trimmed);
+  }, [coords, expandedWhere, query]);
 
   async function loadUserLocation() {
     try {
-      setLoading(true)
-      const { status } = await Location.requestForegroundPermissionsAsync()
+      setLoading(true);
+      const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
-        setItems([])
-        return
+        setItems([]);
+        return;
       }
 
-      const current = await Location.getCurrentPositionAsync({})
+      const current = await Location.getCurrentPositionAsync({});
       setCoords({
         latitude: current.coords.latitude,
-        longitude: current.coords.longitude
-      })
+        longitude: current.coords.longitude,
+      });
     } catch (e) {
-      console.log("location error", e)
-      setItems([])
+      console.log("location error", e);
+      setItems([]);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
   async function loadNearby() {
-    if (!coords) return
+    if (!coords) return;
 
     try {
-      setLoading(true)
+      setLoading(true);
 
-      const revUrl = `https://api.mapbox.com/geocoding/v5/mapbox.places/${coords.longitude},${coords.latitude}.json?types=place,region,country&limit=5&access_token=${MAPBOX_TOKEN}`
+      const revUrl = `https://api.mapbox.com/geocoding/v5/mapbox.places/${coords.longitude},${coords.latitude}.json?types=place,region,country&limit=5&access_token=${MAPBOX_TOKEN}`;
 
-      const revRes = await fetch(revUrl)
-      const revData = await revRes.json()
-      const revFeatures = Array.isArray(revData.features) ? revData.features : []
+      const revRes = await fetch(revUrl);
+      const revData = await revRes.json();
+      const revFeatures = Array.isArray(revData.features)
+        ? revData.features
+        : [];
 
-      const nearestCity = revFeatures.find(f => f.place_type?.includes("place"))
+      const nearestCity = revFeatures.find((f) =>
+        f.place_type?.includes("place")
+      );
 
-      let regionText = null
-      let countryText = null
+      let regionText = null;
+      let countryText = null;
 
       if (nearestCity && Array.isArray(nearestCity.context)) {
-        const regionContext = nearestCity.context.find(c =>
+        const regionContext = nearestCity.context.find((c) =>
           c.id.startsWith("region")
-        )
-        const countryContext = nearestCity.context.find(c =>
+        );
+        const countryContext = nearestCity.context.find((c) =>
           c.id.startsWith("country")
-        )
-        regionText = regionContext ? regionContext.text : null
-        countryText = countryContext ? countryContext.text : null
+        );
+        regionText = regionContext ? regionContext.text : null;
+        countryText = countryContext ? countryContext.text : null;
       }
 
-      const combined = []
-      const seen = new Set()
+      const combined = [];
+      const seen = new Set();
 
-      const pushUnique = feature => {
-        if (!feature || seen.has(feature.id)) return
-        if (!feature.place_type?.includes("place")) return
-        seen.add(feature.id)
-        combined.push(feature)
-      }
+      const pushUnique = (feature) => {
+        if (!feature || seen.has(feature.id)) return;
+        if (!feature.place_type?.includes("place")) return;
+        seen.add(feature.id);
+        combined.push(feature);
+      };
 
-      revFeatures.forEach(pushUnique)
+      revFeatures.forEach(pushUnique);
 
       async function fetchForward(q) {
-        const encoded = encodeURIComponent(q)
-        const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encoded}.json?types=place&proximity=${coords.longitude},${coords.latitude}&limit=10&access_token=${MAPBOX_TOKEN}`
-        const res = await fetch(url)
-        const data = await res.json()
-        const features = Array.isArray(data.features) ? data.features : []
-        features.forEach(pushUnique)
+        const encoded = encodeURIComponent(q);
+        const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encoded}.json?types=place&proximity=${coords.longitude},${coords.latitude}&limit=10&access_token=${MAPBOX_TOKEN}`;
+        const res = await fetch(url);
+        const data = await res.json();
+        const features = Array.isArray(data.features) ? data.features : [];
+        features.forEach(pushUnique);
       }
 
       if (regionText) {
-        await fetchForward(regionText)
+        await fetchForward(regionText);
       }
       if (countryText) {
-        await fetchForward(countryText)
+        await fetchForward(countryText);
       }
 
-      const limited = combined.slice(0, 10)
+      const limited = combined.slice(0, 10);
 
-      const mapped = limited.map(f => ({
+      const mapped = limited.map((f) => ({
         id: f.id,
         title: f.text,
         subtitle: f.place_name.replace(`${f.text}, `, ""),
-        center: f.center
-      }))
+        center: f.center,
+      }));
 
-      setItems(mapped)
+      setItems(mapped);
     } catch (e) {
-      console.log("nearby error", e)
-      setItems([])
+      console.log("nearby error", e);
+      setItems([]);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
   async function searchPlaces(text) {
-    if (!coords) return
+    if (!coords) return;
 
     try {
-      setLoading(true)
+      setLoading(true);
 
-      const encoded = encodeURIComponent(text)
-      const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encoded}.json?autocomplete=true&proximity=${coords.longitude},${coords.latitude}&types=place,locality,neighborhood,region,country&limit=10&access_token=${MAPBOX_TOKEN}`
+      const encoded = encodeURIComponent(text);
+      const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encoded}.json?autocomplete=true&proximity=${coords.longitude},${coords.latitude}&types=place,locality,neighborhood,region,country&limit=10&access_token=${MAPBOX_TOKEN}`;
 
-      const res = await fetch(url)
-      const data = await res.json()
+      const res = await fetch(url);
+      const data = await res.json();
 
-      const features = Array.isArray(data.features) ? data.features : []
+      const features = Array.isArray(data.features) ? data.features : [];
 
-      const mapped = features.map(f => ({
+      const mapped = features.map((f) => ({
         id: f.id,
         title: f.text,
         subtitle: f.place_name.replace(`${f.text}, `, ""),
-        center: f.center
-      }))
+        center: f.center,
+      }));
 
-      setItems(mapped)
+      setItems(mapped);
     } catch (e) {
-      console.log("search error", e)
-      setItems([])
+      console.log("search error", e);
+      setItems([]);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
   function closeSheet() {
-    navigation.goBack()
+    navigation.goBack();
   }
 
   function handleChevronPress() {
     if (expandedWhere || showCalendar) {
-      setExpandedWhere(false)
-      setShowCalendar(false)
-      return
+      setExpandedWhere(false);
+      setShowCalendar(false);
+      return;
     }
-    closeSheet()
+    closeSheet();
   }
 
   function handleWherePress() {
-    setExpandedWhere(true)
+    setExpandedWhere(true);
   }
 
   function handleClearAll() {
-    setQuery("")
-    setSelectedLocation(null)
-    setExpandedWhere(false)
-    setStartDate(null)
-    setEndDate(null)
+    setQuery("");
+    setSelectedLocation(null);
+    setExpandedWhere(false);
+    setStartDate(null);
+    setEndDate(null);
   }
 
   function handleSelectLocation(item) {
@@ -210,17 +215,17 @@ export default function MeetSearchScreen() {
         id: "nearby",
         title: "Nearby",
         subtitle: "Find what is around you",
-        center: coords ? [coords.longitude, coords.latitude] : null
-      }
-      setSelectedLocation(value)
-      setQuery(value.title)
+        center: coords ? [coords.longitude, coords.latitude] : null,
+      };
+      setSelectedLocation(value);
+      setQuery(value.title);
     } else {
-      setSelectedLocation(item)
-      setQuery(item.title)
+      setSelectedLocation(item);
+      setQuery(item.title);
     }
 
     if (expandedWhere) {
-      setExpandedWhere(false)
+      setExpandedWhere(false);
     }
   }
 
@@ -231,103 +236,103 @@ export default function MeetSearchScreen() {
       center: selectedLocation?.center
         ? {
             latitude: selectedLocation.center[1],
-            longitude: selectedLocation.center[0]
+            longitude: selectedLocation.center[0],
           }
         : null,
       startDate,
-      endDate
-    }
+      endDate,
+    };
 
-    navigation.replace("MeetResults", payload)
+    navigation.replace("MeetResults", payload);
   }
 
   function handleOpenCalendar() {
-    setShowCalendar(true)
+    setShowCalendar(true);
   }
 
   function handleCalendarBack() {
-    setShowCalendar(false)
+    setShowCalendar(false);
   }
 
   function onDayPress(day) {
-    const dateStr = day.dateString
+    const dateStr = day.dateString;
 
     if (!startDate || (startDate && endDate)) {
-      setStartDate(dateStr)
-      setEndDate(null)
-      return
+      setStartDate(dateStr);
+      setEndDate(null);
+      return;
     }
 
     if (startDate && !endDate) {
       if (dateStr < startDate) {
-        setStartDate(dateStr)
-        setEndDate(null)
+        setStartDate(dateStr);
+        setEndDate(null);
       } else if (dateStr === startDate) {
-        setEndDate(null)
+        setEndDate(null);
       } else {
-        setEndDate(dateStr)
+        setEndDate(dateStr);
       }
     }
   }
 
   const markedDates = useMemo(() => {
-    if (!startDate && !endDate) return {}
+    if (!startDate && !endDate) return {};
 
-    const marked = {}
+    const marked = {};
 
     if (startDate) {
       marked[startDate] = {
         startingDay: true,
         endingDay: !endDate,
         color: "#111827",
-        textColor: "#ffffff"
-      }
+        textColor: "#ffffff",
+      };
     }
 
     if (startDate && endDate) {
       marked[endDate] = {
         endingDay: true,
         color: "#111827",
-        textColor: "#ffffff"
-      }
+        textColor: "#ffffff",
+      };
 
-      let current = new Date(startDate)
-      const end = new Date(endDate)
+      let current = new Date(startDate);
+      const end = new Date(endDate);
 
       while (true) {
-        current.setDate(current.getDate() + 1)
-        const iso = current.toISOString().slice(0, 10)
-        if (iso >= endDate) break
+        current.setDate(current.getDate() + 1);
+        const iso = current.toISOString().slice(0, 10);
+        if (iso >= endDate) break;
         marked[iso] = {
           color: "#e5e7eb",
-          textColor: "#111827"
-        }
+          textColor: "#111827",
+        };
       }
     }
 
-    return marked
-  }, [startDate, endDate])
+    return marked;
+  }, [startDate, endDate]);
 
   function clearDates() {
-    setStartDate(null)
-    setEndDate(null)
+    setStartDate(null);
+    setEndDate(null);
   }
 
   function formatDateRangeLabel() {
     if (startDate && endDate) {
-      const s = new Date(startDate)
-      const e = new Date(endDate)
+      const s = new Date(startDate);
+      const e = new Date(endDate);
       const sStr = s.toLocaleDateString("en-US", {
         month: "short",
-        day: "numeric"
-      })
+        day: "numeric",
+      });
       const eStr = e.toLocaleDateString("en-US", {
         month: "short",
-        day: "numeric"
-      })
-      return `${sStr} – ${eStr}`
+        day: "numeric",
+      });
+      return `${sStr} – ${eStr}`;
     }
-    return "Any week"
+    return "Any week";
   }
 
   const listItems = [
@@ -335,10 +340,10 @@ export default function MeetSearchScreen() {
       id: "nearby-static",
       title: "Nearby",
       subtitle: "Find what is around you",
-      isNearbyStatic: true
+      isNearbyStatic: true,
     },
-    ...items
-  ]
+    ...items,
+  ];
 
   function renderSheetContent() {
     if (showCalendar) {
@@ -375,7 +380,7 @@ export default function MeetSearchScreen() {
             </TouchableOpacity>
           </View>
         </View>
-      )
+      );
     }
 
     if (expandedWhere) {
@@ -414,7 +419,7 @@ export default function MeetSearchScreen() {
             contentContainerStyle={styles.suggestionsContent}
             showsVerticalScrollIndicator={false}
           >
-            {listItems.map(item => (
+            {listItems.map((item) => (
               <TouchableOpacity
                 key={item.id}
                 style={styles.suggestionRow}
@@ -433,15 +438,13 @@ export default function MeetSearchScreen() {
 
                 <View style={styles.suggestionTextWrap}>
                   <Text style={styles.suggestionTitle}>{item.title}</Text>
-                  <Text style={styles.suggestionSubtitle}>
-                    {item.subtitle}
-                  </Text>
+                  <Text style={styles.suggestionSubtitle}>{item.subtitle}</Text>
                 </View>
               </TouchableOpacity>
             ))}
           </ScrollView>
         </View>
-      )
+      );
     }
 
     return (
@@ -476,9 +479,7 @@ export default function MeetSearchScreen() {
           </View>
 
           <View style={styles.suggestionsSection}>
-            <Text style={styles.suggestionsTitle}>
-              Suggested destinations
-            </Text>
+            <Text style={styles.suggestionsTitle}>Suggested destinations</Text>
 
             {loading && (
               <View style={styles.loadingRow}>
@@ -486,7 +487,7 @@ export default function MeetSearchScreen() {
               </View>
             )}
 
-            {listItems.slice(0, 5).map(item => (
+            {listItems.slice(0, 5).map((item) => (
               <TouchableOpacity
                 key={item.id}
                 style={styles.suggestionRow}
@@ -505,9 +506,7 @@ export default function MeetSearchScreen() {
 
                 <View style={styles.suggestionTextWrap}>
                   <Text style={styles.suggestionTitle}>{item.title}</Text>
-                  <Text style={styles.suggestionSubtitle}>
-                    {item.subtitle}
-                  </Text>
+                  <Text style={styles.suggestionSubtitle}>{item.subtitle}</Text>
                 </View>
               </TouchableOpacity>
             ))}
@@ -545,7 +544,7 @@ export default function MeetSearchScreen() {
           </TouchableOpacity>
         </View>
       </View>
-    )
+    );
   }
 
   return (
@@ -554,25 +553,25 @@ export default function MeetSearchScreen() {
       <View
         style={[
           styles.overlayRoot,
-          { paddingTop: insets.top + 8 } // pushes card below island
+          { paddingTop: insets.top + 8 }, // pushes card below island
         ]}
       >
         {renderSheetContent()}
       </View>
     </SafeAreaView>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: "transparent"
+    backgroundColor: "transparent",
   },
   overlayRoot: {
     flex: 1,
     justifyContent: "flex-start",
     paddingHorizontal: 12,
-    paddingBottom: 24
+    paddingBottom: 24,
   },
   mainCard: {
     flex: 1,
@@ -585,11 +584,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.18,
     shadowRadius: 20,
     shadowOffset: { width: 0, height: 10 },
-    elevation: 6
+    elevation: 6,
   },
   headerRow: {
     alignItems: "flex-start",
-    marginBottom: 8
+    marginBottom: 8,
   },
   chevronButton: {
     width: 32,
@@ -597,14 +596,14 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     backgroundColor: "#ffffff",
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
   },
   title: {
     fontSize: 28,
     fontWeight: "700",
     marginTop: 8,
     marginBottom: 12,
-    color: "#111827"
+    color: "#111827",
   },
   whereCard: {
     borderRadius: 28,
@@ -614,7 +613,7 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
     borderWidth: 0.5,
     borderColor: "#e5e7eb",
-    marginBottom: 12
+    marginBottom: 12,
   },
   whereSearchRow: {
     flexDirection: "row",
@@ -623,31 +622,31 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#e5e7eb",
     paddingHorizontal: 12,
-    paddingVertical: 8
+    paddingVertical: 8,
   },
   searchInput: {
     flex: 1,
     marginLeft: 8,
-    fontSize: 14
+    fontSize: 14,
   },
   suggestionsSection: {
-    marginTop: 14
+    marginTop: 14,
   },
   suggestionsTitle: {
     fontSize: 13,
     color: "#6b7280",
-    marginBottom: 8
+    marginBottom: 8,
   },
   loadingRow: {
-    paddingVertical: 6
+    paddingVertical: 6,
   },
   suggestionRow: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 8
+    paddingVertical: 8,
   },
   suggestionIconWrap: {
-    marginRight: 12
+    marginRight: 12,
   },
   suggestionIconInner: {
     width: 40,
@@ -655,19 +654,19 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: "#ecfdf3",
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
   },
   suggestionTextWrap: {
-    flex: 1
+    flex: 1,
   },
   suggestionTitle: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#111827"
+    color: "#111827",
   },
   suggestionSubtitle: {
     fontSize: 13,
-    color: "#6b7280"
+    color: "#6b7280",
   },
   sectionCard: {
     borderRadius: 18,
@@ -677,33 +676,33 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     borderColor: "#e5e7eb",
     marginTop: 16,
-    marginBottom: 16
+    marginBottom: 16,
   },
   sectionCardContent: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between"
+    justifyContent: "space-between",
   },
   sectionLabel: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#111827"
+    color: "#111827",
   },
   sectionSubtitle: {
     fontSize: 13,
     color: "#6b7280",
-    marginTop: 2
+    marginTop: 2,
   },
   bottomRow: {
     marginTop: 12,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between"
+    justifyContent: "space-between",
   },
   clearAllText: {
     fontSize: 14,
     textDecorationLine: "underline",
-    color: "#111827"
+    color: "#111827",
   },
   searchButton: {
     flexDirection: "row",
@@ -711,13 +710,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     paddingVertical: 10,
     borderRadius: 999,
-    backgroundColor: "#e11d48"
+    backgroundColor: "#e11d48",
   },
   searchButtonText: {
     marginLeft: 6,
     fontSize: 15,
     fontWeight: "600",
-    color: "#ffffff"
+    color: "#ffffff",
   },
   sheetCard: {
     flex: 1,
@@ -730,25 +729,25 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.18,
     shadowRadius: 20,
     shadowOffset: { width: 0, height: 10 },
-    elevation: 6
+    elevation: 6,
   },
   sheetHeaderRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 8
+    marginBottom: 8,
   },
   sheetBackButton: {
     width: 28,
     height: 28,
     borderRadius: 14,
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
   },
   sheetTitle: {
     flex: 1,
     textAlign: "center",
     fontSize: 16,
-    fontWeight: "600"
+    fontWeight: "600",
   },
   expandedSearchRow: {
     flexDirection: "row",
@@ -758,28 +757,28 @@ const styles = StyleSheet.create({
     borderColor: "#e5e7eb",
     paddingHorizontal: 8,
     paddingVertical: 8,
-    marginBottom: 10
+    marginBottom: 10,
   },
   expandedSearchInput: {
     flex: 1,
     marginLeft: 4,
-    fontSize: 14
+    fontSize: 14,
   },
   suggestionsTitleExpanded: {
     fontSize: 13,
     color: "#6b7280",
-    marginBottom: 8
+    marginBottom: 8,
   },
   suggestionsScrollExpanded: {
-    flex: 1
+    flex: 1,
   },
   suggestionsContent: {
-    paddingBottom: 8
+    paddingBottom: 8,
   },
   calendarBottomRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginTop: 12
-  }
-})
+    marginTop: 12,
+  },
+});

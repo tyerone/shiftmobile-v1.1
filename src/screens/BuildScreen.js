@@ -1,6 +1,6 @@
-import React from "react"
-import { View, Text, StyleSheet } from "react-native"
-import { SafeAreaView } from "react-native-safe-area-context"
+import React from "react";
+import { View, Text, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function BuildScreen() {
   return (
@@ -10,12 +10,12 @@ export default function BuildScreen() {
         <Text style={styles.body}>Build tab screen</Text>
       </View>
     </SafeAreaView>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: "#fff" },
   container: { flex: 1, padding: 24 },
   title: { fontSize: 28, fontWeight: "700", marginBottom: 12 },
-  body: { fontSize: 16 }
-})
+  body: { fontSize: 16 },
+});

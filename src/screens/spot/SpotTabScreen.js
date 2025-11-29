@@ -1,5 +1,5 @@
 // src/screens/spot/SpotTabScreen.js
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -7,8 +7,8 @@ import {
   FlatList,
   Image,
   ActivityIndicator,
-  ScrollView
-} from "react-native"
+  ScrollView,
+} from "react-native";
 import {
   collection,
   query,
@@ -17,11 +17,11 @@ import {
   limit,
   onSnapshot,
   doc,
-  getDoc
-} from "firebase/firestore"
-import { SafeAreaView } from "react-native-safe-area-context"
-import { db } from "../../utils/firebaseConfig"
-import { useAuth } from "../../utils/AuthContext"
+  getDoc,
+} from "firebase/firestore";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { db } from "../../utils/firebaseConfig";
+import { useAuth } from "../../utils/AuthContext";
 
 function SpotRowSection({ title, loading, data }) {
   return (
@@ -37,7 +37,7 @@ function SpotRowSection({ title, loading, data }) {
       ) : (
         <FlatList
           data={data}
-          keyExtractor={item => item.id}
+          keyExtractor={(item) => item.id}
           renderItem={({ item }) => <SpotCard spot={item} />}
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -45,14 +45,14 @@ function SpotRowSection({ title, loading, data }) {
         />
       )}
     </View>
-  )
+  );
 }
 
 function SpotCard({ spot }) {
   const title =
     spot.brand && spot.modelGuess
       ? `${spot.brand} ${spot.modelGuess}`
-      : spot.brand || "Car"
+      : spot.brand || "Car";
 
   return (
     <View style={styles.card}>
@@ -66,20 +66,20 @@ function SpotCard({ spot }) {
         {title}
       </Text>
     </View>
-  )
+  );
 }
 
 export default function SpotTabScreen() {
-  const { user } = useAuth()
+  const { user } = useAuth();
 
-  const [recentSpots, setRecentSpots] = useState([])
-  const [loadingRecent, setLoadingRecent] = useState(true)
+  const [recentSpots, setRecentSpots] = useState([]);
+  const [loadingRecent, setLoadingRecent] = useState(true);
 
-  const [savedSpots, setSavedSpots] = useState([])
-  const [loadingSaved, setLoadingSaved] = useState(true)
+  const [savedSpots, setSavedSpots] = useState([]);
+  const [loadingSaved, setLoadingSaved] = useState(true);
 
-  const [yourSpots, setYourSpots] = useState([])
-  const [loadingYourSpots, setLoadingYourSpots] = useState(true)
+  const [yourSpots, setYourSpots] = useState([]);
+  const [loadingYourSpots, setLoadingYourSpots] = useState(true);
 
   // Recent (global)
   useEffect(() => {
@@ -87,30 +87,30 @@ export default function SpotTabScreen() {
       collection(db, "spots"),
       orderBy("createdAt", "desc"),
       limit(12)
-    )
+    );
 
     const unsub = onSnapshot(
       qRecent,
-      snapshot => {
-        const list = snapshot.docs.map(d => ({ id: d.id, ...d.data() }))
-        setRecentSpots(list)
-        setLoadingRecent(false)
+      (snapshot) => {
+        const list = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+        setRecentSpots(list);
+        setLoadingRecent(false);
       },
-      err => {
-        console.log("recent spots error", err)
-        setLoadingRecent(false)
+      (err) => {
+        console.log("recent spots error", err);
+        setLoadingRecent(false);
       }
-    )
+    );
 
-    return () => unsub()
-  }, [])
+    return () => unsub();
+  }, []);
 
   // Your spots
   useEffect(() => {
     if (!user) {
-      setYourSpots([])
-      setLoadingYourSpots(false)
-      return
+      setYourSpots([]);
+      setLoadingYourSpots(false);
+      return;
     }
 
     const qUser = query(
@@ -118,74 +118,76 @@ export default function SpotTabScreen() {
       where("uid", "==", user.uid),
       orderBy("createdAt", "desc"),
       limit(12)
-    )
+    );
 
     const unsub = onSnapshot(
       qUser,
-      snapshot => {
-        const list = snapshot.docs.map(d => ({ id: d.id, ...d.data() }))
-        setYourSpots(list)
-        setLoadingYourSpots(false)
+      (snapshot) => {
+        const list = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+        setYourSpots(list);
+        setLoadingYourSpots(false);
       },
-      err => {
-        console.log("your spots error", err)
-        setLoadingYourSpots(false)
+      (err) => {
+        console.log("your spots error", err);
+        setLoadingYourSpots(false);
       }
-    )
+    );
 
-    return () => unsub()
-  }, [user])
+    return () => unsub();
+  }, [user]);
 
   // Saved spots
   useEffect(() => {
     async function loadSaved(ids) {
       if (!ids || ids.length === 0) {
-        setSavedSpots([])
-        setLoadingSaved(false)
-        return
+        setSavedSpots([]);
+        setLoadingSaved(false);
+        return;
       }
 
       try {
         const snaps = await Promise.all(
-          ids.map(id => getDoc(doc(db, "spots", id)))
-        )
-        const list = snaps.filter(s => s.exists()).map(s => ({ id: s.id, ...s.data() }))
-        setSavedSpots(list)
+          ids.map((id) => getDoc(doc(db, "spots", id)))
+        );
+        const list = snaps
+          .filter((s) => s.exists())
+          .map((s) => ({ id: s.id, ...s.data() }));
+        setSavedSpots(list);
       } catch (err) {
-        console.log("saved error", err)
+        console.log("saved error", err);
       } finally {
-        setLoadingSaved(false)
+        setLoadingSaved(false);
       }
     }
 
     if (!user) {
-      setSavedSpots([])
-      setLoadingSaved(false)
-      return
+      setSavedSpots([]);
+      setLoadingSaved(false);
+      return;
     }
 
-    setLoadingSaved(true)
+    setLoadingSaved(true);
 
-    const userRef = doc(db, "users", user.uid)
+    const userRef = doc(db, "users", user.uid);
     const unsub = onSnapshot(
       userRef,
-      snap => {
+      (snap) => {
         if (!snap.exists()) {
-          setSavedSpots([])
-          setLoadingSaved(false)
-          return
+          setSavedSpots([]);
+          setLoadingSaved(false);
+          return;
         }
-        const ids = snap.data().savedSpots || []
-        loadSaved(ids)
+        const ids = snap.data().savedSpots || [];
+        loadSaved(ids);
       },
-      err => {
-        console.log("saved user error", err)
-        setLoadingSaved(false)
+      (err) => {
+        console.log("saved user error", err);
+        setLoadingSaved(false);
       }
-    )
+    );
 
-    return () => unsub()
-  }, [user])
+    return () => unsub();
+  }, [user]);
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -213,7 +215,7 @@ export default function SpotTabScreen() {
         />
       </ScrollView>
     </SafeAreaView>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -226,26 +228,26 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "600",
     marginHorizontal: 20,
-    marginBottom: 8
+    marginBottom: 8,
   },
   sectionLoading: {
     height: 160,
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
   },
   sectionEmpty: {
     marginHorizontal: 20,
     fontSize: 14,
-    color: "#9ca3af"
+    color: "#9ca3af",
   },
 
   cardsRow: {
-    paddingHorizontal: 20
+    paddingHorizontal: 20,
   },
 
   card: {
     width: 140,
-    marginRight: 12
+    marginRight: 12,
   },
 
   cardImage: {
@@ -253,11 +255,11 @@ const styles = StyleSheet.create({
     aspectRatio: 1,
     borderRadius: 20,
     backgroundColor: "#e5e7eb",
-    marginBottom: 6
+    marginBottom: 6,
   },
   cardTitle: {
     fontSize: 13,
     fontWeight: "600",
-    color: "#111827"
-  }
-})
+    color: "#111827",
+  },
+});
