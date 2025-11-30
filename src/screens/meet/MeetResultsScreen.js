@@ -73,11 +73,22 @@ function createMockMeets(center) {
     const randomMinute = Math.random() > 0.5 ? "00" : "30";
 
     return {
+      // id: `meet-${index}`,
+      // title: `Meet ${index + 1}`,
+      // subtitle: descriptions[index % descriptions.length],
+      // time: `${randomHour}:${randomMinute}`,
+      // description: descriptions[index % descriptions.length],
+      // latitude: baseLat + o.dy,
+      // longitude: baseLng + o.dx,
       id: `meet-${index}`,
       title: `Meet ${index + 1}`,
       subtitle: descriptions[index % descriptions.length],
       time: `${randomHour}:${randomMinute}`,
+      date: `Today at ${randomHour}:${randomMinute}`,
       description: descriptions[index % descriptions.length],
+      organizer: "Shamikh", // mock organizer name
+      organizerPhoto: "https://i.pravatar.cc/300?img=12", // profile pic placeholder
+      image: "https://images.unsplash.com/photo-1549921296-3a6b44e2a9b8", // CAR PHOTO
       latitude: baseLat + o.dy,
       longitude: baseLng + o.dx,
     };
@@ -219,14 +230,14 @@ export default function MeetResultsScreen() {
             }}
           >
             {/* Car Photo */}
-            <Image
+            {/* <Image
               source={{ uri: selectedMeet?.image }}
               style={{
                 width: "100%",
                 height: 260,
               }}
               resizeMode="cover"
-            />
+            /> */}
 
             {/* Content */}
             <View style={{ padding: 20 }}>
@@ -238,7 +249,7 @@ export default function MeetResultsScreen() {
                   marginBottom: 10,
                 }}
               >
-                <Image
+                {/* <Image
                   source={{ uri: selectedMeet?.organizerPhoto }}
                   style={{
                     width: 40,
@@ -246,7 +257,7 @@ export default function MeetResultsScreen() {
                     borderRadius: 20,
                     marginRight: 10,
                   }}
-                />
+                /> */}
                 <Text style={{ fontSize: 15, color: "#444" }}>
                   {selectedMeet?.organizer}
                 </Text>
