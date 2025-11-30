@@ -1,4 +1,5 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
+import { Modal } from "react-native";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MapView, { Marker } from "react-native-maps";
@@ -23,6 +24,28 @@ function formatDateRangeLabel(startDate, endDate) {
 }
 
 // quick mock meets near the center
+// function createMockMeets(center) {
+//   const baseLat = center?.latitude ?? 49.2827;
+//   const baseLng = center?.longitude ?? -123.1207;
+
+//   const offsets = [
+//     { dx: 0.01, dy: 0.0 },
+//     { dx: -0.008, dy: 0.004 },
+//     { dx: 0.006, dy: -0.005 },
+//     { dx: -0.012, dy: -0.006 },
+//     { dx: 0.002, dy: 0.007 },
+//     { dx: -0.004, dy: -0.002 },
+//   ];
+
+//   return offsets.map((o, index) => ({
+//     id: `meet-${index}`,
+//     title: `Meet ${index + 1}`,
+//     subtitle: "Car meet",
+//     latitude: baseLat + o.dy,
+//     longitude: baseLng + o.dx,
+//   }));
+// }
+
 function createMockMeets(center) {
   const baseLat = center?.latitude ?? 49.2827;
   const baseLng = center?.longitude ?? -123.1207;
@@ -36,18 +59,36 @@ function createMockMeets(center) {
     { dx: -0.004, dy: -0.002 },
   ];
 
-  return offsets.map((o, index) => ({
-    id: `meet-${index}`,
-    title: `Meet ${index + 1}`,
-    subtitle: "Car meet",
-    latitude: baseLat + o.dy,
-    longitude: baseLng + o.dx,
-  }));
+  const descriptions = [
+    "Chill evening meet",
+    "Photoshoot + cruise",
+    "Casual parking lot hangout",
+    "JDM only meet",
+    "All cars welcome!",
+    "Morning coffee run",
+  ];
+
+  return offsets.map((o, index) => {
+    const randomHour = 18 + Math.floor(Math.random() * 4); // between 6–9 PM
+    const randomMinute = Math.random() > 0.5 ? "00" : "30";
+
+    return {
+      id: `meet-${index}`,
+      title: `Meet ${index + 1}`,
+      subtitle: descriptions[index % descriptions.length],
+      time: `${randomHour}:${randomMinute}`,
+      description: descriptions[index % descriptions.length],
+      latitude: baseLat + o.dy,
+      longitude: baseLng + o.dx,
+    };
+  });
 }
 
 export default function MeetResultsScreen() {
   const navigation = useNavigation();
   const route = useRoute();
+  const [selectedMeet, setSelectedMeet] = useState(null);
+
 
   const { locationTitle, locationSubtitle, center, startDate, endDate } =
     route.params || {};
@@ -63,6 +104,7 @@ export default function MeetResultsScreen() {
   );
 
   const meets = useMemo(() => createMockMeets(center), [center]);
+
 
   const dateLabel = formatDateRangeLabel(startDate, endDate);
   const headerTitle = locationTitle || locationSubtitle || "Meets in this area";
@@ -80,17 +122,33 @@ export default function MeetResultsScreen() {
       <View style={styles.container}>
         <MapView style={styles.map} initialRegion={region}>
           {meets.map((meet) => (
+            // <Marker
+            //   key={meet.id}
+            //   coordinate={{
+            //     latitude: meet.latitude,
+            //     longitude: meet.longitude,
+            //   }}
+            // >
+            //   <View style={styles.pricePill}>
+            //     <View style={styles.priceDot} />
+            //     <Text style={styles.priceText}>{meet.title}</Text>
+            //   </View>
+            // </Marker>
+
             <Marker
               key={meet.id}
               coordinate={{
                 latitude: meet.latitude,
                 longitude: meet.longitude,
               }}
+              onPress={() => setSelectedMeet(meet)}
             >
-              <View style={styles.pricePill}>
-                <View style={styles.priceDot} />
-                <Text style={styles.priceText}>{meet.title}</Text>
-              </View>
+              <TouchableOpacity activeOpacity={0.8}>
+                <View style={styles.pricePill}>
+                  <View style={styles.priceDot} />
+                  <Text style={styles.priceText}>{meet.title}</Text>
+                </View>
+              </TouchableOpacity>
             </Marker>
           ))}
         </MapView>
@@ -136,6 +194,58 @@ export default function MeetResultsScreen() {
           </Text>
         </View>
       </View>
+      {/* Meet Details Popup */}
+      <Modal
+        visible={!!selectedMeet}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setSelectedMeet(null)}
+      >
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: "rgba(0,0,0,0.3)",
+            justifyContent: "flex-end",
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: "#fff",
+              padding: 20,
+              borderTopLeftRadius: 24,
+              borderTopRightRadius: 24,
+            }}
+          >
+            <Text style={{ fontSize: 22, fontWeight: "700" }}>
+              {selectedMeet?.title}
+            </Text>
+
+            <Text style={{ marginTop: 4, fontSize: 16, color: "#4b5563" }}>
+              {selectedMeet?.subtitle}
+            </Text>
+
+            <Text style={{ marginTop: 8, fontSize: 15, color: "#6b7280" }}>
+              Time: {selectedMeet?.time}
+            </Text>
+
+            <TouchableOpacity
+              onPress={() => setSelectedMeet(null)}
+              style={{
+                marginTop: 22,
+                backgroundColor: "#111",
+                paddingVertical: 14,
+                borderRadius: 12,
+              }}
+            >
+              <Text
+                style={{ color: "#fff", textAlign: "center", fontSize: 16 }}
+              >
+                Close
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
