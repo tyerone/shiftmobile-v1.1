@@ -1,10 +1,22 @@
+// MeetResultsScreen.js
 import React, { useMemo, useState } from "react";
-import { Modal } from "react-native";
-import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  Modal,
+  ScrollView,
+  Dimensions,
+  Pressable,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MapView, { Marker } from "react-native-maps";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
+
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 function formatDateRangeLabel(startDate, endDate) {
   if (startDate && endDate) {
@@ -23,33 +35,9 @@ function formatDateRangeLabel(startDate, endDate) {
   return "Any week";
 }
 
-// quick mock meets near the center
-// function createMockMeets(center) {
-//   const baseLat = center?.latitude ?? 49.2827;
-//   const baseLng = center?.longitude ?? -123.1207;
-
-//   const offsets = [
-//     { dx: 0.01, dy: 0.0 },
-//     { dx: -0.008, dy: 0.004 },
-//     { dx: 0.006, dy: -0.005 },
-//     { dx: -0.012, dy: -0.006 },
-//     { dx: 0.002, dy: 0.007 },
-//     { dx: -0.004, dy: -0.002 },
-//   ];
-
-//   return offsets.map((o, index) => ({
-//     id: `meet-${index}`,
-//     title: `Meet ${index + 1}`,
-//     subtitle: "Car meet",
-//     latitude: baseLat + o.dy,
-//     longitude: baseLng + o.dx,
-//   }));
-// }
-
 function createMockMeets(center) {
   const baseLat = center?.latitude ?? 49.2827;
   const baseLng = center?.longitude ?? -123.1207;
-
   const offsets = [
     { dx: 0.01, dy: 0.0 },
     { dx: -0.008, dy: 0.004 },
@@ -58,7 +46,6 @@ function createMockMeets(center) {
     { dx: 0.002, dy: 0.007 },
     { dx: -0.004, dy: -0.002 },
   ];
-
   const descriptions = [
     "Chill evening meet",
     "Photoshoot + cruise",
@@ -67,7 +54,6 @@ function createMockMeets(center) {
     "All cars welcome!",
     "Morning coffee run",
   ];
-
   const images = [
     "https://bangshift.com/wp-content/uploads/2017/01/kelly-python1.jpg",
     "https://s3.us-west-2.amazonaws.com/static.roadstr.io/web/article-sunsetgt/main2.jpg",
@@ -78,30 +64,18 @@ function createMockMeets(center) {
   ];
 
   return offsets.map((o, index) => {
-    const randomHour = 18 + Math.floor(Math.random() * 4); // between 6–9 PM
+    const randomHour = 18 + Math.floor(Math.random() * 4); // between 18–21 (6–9pm)
     const randomMinute = Math.random() > 0.5 ? "00" : "30";
-
     return {
-      // id: `meet-${index}`,
-      // title: `Meet ${index + 1}`,
-      // subtitle: descriptions[index % descriptions.length],
-      // time: `${randomHour}:${randomMinute}`,
-      // description: descriptions[index % descriptions.length],
-      // latitude: baseLat + o.dy,
-      // longitude: baseLng + o.dx,
       id: `meet-${index}`,
       title: `Meet ${index + 1}`,
       subtitle: descriptions[index % descriptions.length],
       time: `${randomHour}:${randomMinute}`,
       date: `Today at ${randomHour}:${randomMinute}`,
       description: descriptions[index % descriptions.length],
-      organizer: "Shift Inc.", // mock organizer name
-      organizerPhoto: "https://i.pravatar.cc/300?img=12", // profile pic placeholder
-      image:
-        // "https://bangshift.com/wp-content/uploads/2017/01/kelly-python1.jpg",
-
-        images[index % images.length],
-      // CAR PHOTO
+      organizer: "Shift Inc.",
+      organizerPhoto: `https://i.pravatar.cc/300?img=${12 + (index % 10)}`,
+      image: images[index % images.length],
       latitude: baseLat + o.dy,
       longitude: baseLng + o.dx,
     };
@@ -127,7 +101,6 @@ export default function MeetResultsScreen() {
   );
 
   const meets = useMemo(() => createMockMeets(center), [center]);
-
   const dateLabel = formatDateRangeLabel(startDate, endDate);
   const headerTitle = locationTitle || locationSubtitle || "Meets in this area";
 
@@ -136,7 +109,7 @@ export default function MeetResultsScreen() {
   }
 
   function handleFilterPress() {
-    // later open filters sheet
+    // placeholder for filters
   }
 
   return (
@@ -144,19 +117,6 @@ export default function MeetResultsScreen() {
       <View style={styles.container}>
         <MapView style={styles.map} initialRegion={region}>
           {meets.map((meet) => (
-            // <Marker
-            //   key={meet.id}
-            //   coordinate={{
-            //     latitude: meet.latitude,
-            //     longitude: meet.longitude,
-            //   }}
-            // >
-            //   <View style={styles.pricePill}>
-            //     <View style={styles.priceDot} />
-            //     <Text style={styles.priceText}>{meet.title}</Text>
-            //   </View>
-            // </Marker>
-
             <Marker
               key={meet.id}
               coordinate={{
@@ -165,12 +125,10 @@ export default function MeetResultsScreen() {
               }}
               onPress={() => setSelectedMeet(meet)}
             >
-              <TouchableOpacity activeOpacity={0.8}>
-                <View style={styles.pricePill}>
-                  <View style={styles.priceDot} />
-                  <Text style={styles.priceText}>{meet.title}</Text>
-                </View>
-              </TouchableOpacity>
+              <View style={styles.pricePill}>
+                <View style={styles.priceDot} />
+                <Text style={styles.priceText}>{meet.title}</Text>
+              </View>
             </Marker>
           ))}
         </MapView>
@@ -216,6 +174,7 @@ export default function MeetResultsScreen() {
           </Text>
         </View>
       </View>
+
       {/* Meet Details Popup */}
       <Modal
         visible={!!selectedMeet}
@@ -223,100 +182,73 @@ export default function MeetResultsScreen() {
         animationType="slide"
         onRequestClose={() => setSelectedMeet(null)}
       >
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: "rgba(0,0,0,0.3)",
-            justifyContent: "flex-end",
-          }}
-        >
-          <View
-            style={{
-              backgroundColor: "#fff",
-              borderTopLeftRadius: 28,
-              borderTopRightRadius: 28,
-              overflow: "hidden",
-              maxHeight: "85%",
-              shadowColor: "#000",
-              shadowOpacity: 0.15,
-              shadowRadius: 20,
-            }}
-          >
-            {/* Car Photo */}
-            <Image
-              source={{ uri: selectedMeet?.image }}
-              style={{
-                width: "100%",
-                height: 260,
-              }}
-              resizeMode="cover"
-            />
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            {/* Close X */}
+            <Pressable
+              style={styles.modalCloseButton}
+              onPress={() => setSelectedMeet(null)}
+            >
+              <Ionicons name="close" size={22} color="#111827" />
+            </Pressable>
 
-            {/* Content */}
-            <View style={{ padding: 20 }}>
-              {/* Organizer bubble */}
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  marginBottom: 10,
-                }}
-              >
+            <ScrollView contentContainerStyle={styles.modalScroll}>
+              {/* Car Photo */}
+              {selectedMeet?.image ? (
                 <Image
-                  source={{ uri: selectedMeet?.organizerPhoto }}
-                  style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: 20,
-                    marginRight: 10,
-                  }}
+                  source={{ uri: selectedMeet.image }}
+                  style={styles.modalImage}
+                  resizeMode="cover"
                 />
-                <Text style={{ fontSize: 15, color: "#444" }}>
-                  {selectedMeet?.organizer}
+              ) : (
+                <View
+                  style={[styles.modalImage, { backgroundColor: "#f3f4f6" }]}
+                />
+              )}
+
+              {/* Content */}
+              <View style={styles.modalContent}>
+                {/* Organizer bubble */}
+                <View style={styles.organizerRow}>
+                  <Image
+                    source={{ uri: selectedMeet?.organizerPhoto }}
+                    style={styles.organizerAvatar}
+                  />
+                  <Text style={styles.organizerName}>
+                    {selectedMeet?.organizer}
+                  </Text>
+                </View>
+
+                {/* Title */}
+                <Text style={styles.meetTitle}>{selectedMeet?.title}</Text>
+
+                {/* Date */}
+                <Text style={styles.meetDate}>{selectedMeet?.date}</Text>
+
+                {/* Description */}
+                <Text style={styles.meetDescription}>
+                  {selectedMeet?.description}
                 </Text>
-              </View>
 
-              {/* Title */}
-              <Text
-                style={{ fontSize: 22, fontWeight: "700", marginBottom: 4 }}
-              >
-                {selectedMeet?.title}
-              </Text>
-
-              {/* Date */}
-              <Text style={{ fontSize: 16, color: "#666" }}>
-                {selectedMeet?.date}
-              </Text>
-
-              {/* Description */}
-              <Text
-                style={{
-                  marginTop: 10,
-                  fontSize: 15,
-                  color: "#555",
-                  lineHeight: 20,
-                }}
-              >
-                {selectedMeet?.description}
-              </Text>
-
-              {/* Close button */}
-              <TouchableOpacity
-                onPress={() => setSelectedMeet(null)}
-                style={{
-                  marginTop: 22,
-                  backgroundColor: "#0B1C3D",
-                  paddingVertical: 14,
-                  borderRadius: 12,
-                }}
-              >
-                <Text
-                  style={{ color: "#fff", textAlign: "center", fontSize: 16 }}
+                {/* Add to Calendar button (non-functional) */}
+                <TouchableOpacity
+                  onPress={() => {
+                    /* placeholder - non-functional */
+                  }}
+                  style={styles.calendarButton}
                 >
-                  Close
-                </Text>
-              </TouchableOpacity>
-            </View>
+                  <Text style={styles.calendarButtonText}>Add to Calendar</Text>
+                </TouchableOpacity>
+
+                {/* small secondary Close button (redundant) */}
+                <TouchableOpacity
+                  onPress={() => setSelectedMeet(null)}
+                  style={styles.smallClose}
+                >
+                  <Text style={styles.smallCloseText}>Close</Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
           </View>
         </View>
       </Modal>
@@ -335,8 +267,6 @@ const styles = StyleSheet.create({
   map: {
     flex: 1,
   },
-
-  // light bar behind the pill, like Airbnb
   headerBackground: {
     position: "absolute",
     top: 0,
@@ -350,7 +280,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     elevation: 4,
   },
-
   topBarWrapper: {
     position: "absolute",
     top: 8,
@@ -402,7 +331,6 @@ const styles = StyleSheet.create({
     color: "#6b7280",
     marginTop: 2,
   },
-
   pricePill: {
     flexDirection: "row",
     alignItems: "center",
@@ -428,7 +356,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#111827",
   },
-
   bottomSheet: {
     position: "absolute",
     left: 0,
@@ -463,5 +390,103 @@ const styles = StyleSheet.create({
   bottomSubtitle: {
     fontSize: 14,
     color: "#6b7280",
+  },
+
+  /* Modal styles */
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.32)",
+    justifyContent: "flex-end",
+  },
+  modalContainer: {
+    height: Math.min(SCREEN_HEIGHT * 0.88, 920),
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    overflow: "hidden",
+  },
+  modalCloseButton: {
+    position: "absolute",
+    right: 14,
+    top: 10,
+    zIndex: 3,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "rgba(255,255,255,0.9)",
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 6,
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+  },
+  modalScroll: {
+    paddingBottom: 40,
+    backgroundColor: "#fff",
+  },
+  modalImage: {
+    width: "100%",
+    height: 260,
+    backgroundColor: "#eee",
+  },
+  modalContent: {
+    padding: 20,
+    paddingTop: 14,
+  },
+  organizerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  organizerAvatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 10,
+  },
+  organizerName: {
+    fontSize: 15,
+    color: "#444",
+  },
+  meetTitle: {
+    fontSize: 22,
+    fontWeight: "700",
+    marginBottom: 4,
+    color: "#0B1C3D",
+  },
+  meetDate: {
+    fontSize: 16,
+    color: "#666",
+  },
+  meetDescription: {
+    marginTop: 10,
+    fontSize: 15,
+    color: "#555",
+    lineHeight: 20,
+  },
+  calendarButton: {
+    marginTop: 22,
+    backgroundColor: "#0B1C3D",
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  calendarButtonText: {
+    color: "#fff",
+    textAlign: "center",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  smallClose: {
+    marginTop: 12,
+    paddingVertical: 10,
+    alignItems: "center",
+  },
+  smallCloseText: {
+    color: "#0B1C3D",
+    fontSize: 15,
   },
 });
