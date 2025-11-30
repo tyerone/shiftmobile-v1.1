@@ -89,7 +89,6 @@ export default function MeetResultsScreen() {
   const route = useRoute();
   const [selectedMeet, setSelectedMeet] = useState(null);
 
-
   const { locationTitle, locationSubtitle, center, startDate, endDate } =
     route.params || {};
 
@@ -104,7 +103,6 @@ export default function MeetResultsScreen() {
   );
 
   const meets = useMemo(() => createMockMeets(center), [center]);
-
 
   const dateLabel = formatDateRangeLabel(startDate, endDate);
   const headerTitle = locationTitle || locationSubtitle || "Meets in this area";
@@ -197,7 +195,7 @@ export default function MeetResultsScreen() {
       {/* Meet Details Popup */}
       <Modal
         visible={!!selectedMeet}
-        transparent={true}
+        transparent
         animationType="slide"
         onRequestClose={() => setSelectedMeet(null)}
       >
@@ -211,38 +209,90 @@ export default function MeetResultsScreen() {
           <View
             style={{
               backgroundColor: "#fff",
-              padding: 20,
-              borderTopLeftRadius: 24,
-              borderTopRightRadius: 24,
+              borderTopLeftRadius: 28,
+              borderTopRightRadius: 28,
+              overflow: "hidden",
+              maxHeight: "85%",
+              shadowColor: "#000",
+              shadowOpacity: 0.15,
+              shadowRadius: 20,
             }}
           >
-            <Text style={{ fontSize: 22, fontWeight: "700" }}>
-              {selectedMeet?.title}
-            </Text>
-
-            <Text style={{ marginTop: 4, fontSize: 16, color: "#4b5563" }}>
-              {selectedMeet?.subtitle}
-            </Text>
-
-            <Text style={{ marginTop: 8, fontSize: 15, color: "#6b7280" }}>
-              Time: {selectedMeet?.time}
-            </Text>
-
-            <TouchableOpacity
-              onPress={() => setSelectedMeet(null)}
+            {/* Car Photo */}
+            <Image
+              source={{ uri: selectedMeet?.image }}
               style={{
-                marginTop: 22,
-                backgroundColor: "#111",
-                paddingVertical: 14,
-                borderRadius: 12,
+                width: "100%",
+                height: 260,
               }}
-            >
-              <Text
-                style={{ color: "#fff", textAlign: "center", fontSize: 16 }}
+              resizeMode="cover"
+            />
+
+            {/* Content */}
+            <View style={{ padding: 20 }}>
+              {/* Organizer bubble */}
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  marginBottom: 10,
+                }}
               >
-                Close
+                <Image
+                  source={{ uri: selectedMeet?.organizerPhoto }}
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: 20,
+                    marginRight: 10,
+                  }}
+                />
+                <Text style={{ fontSize: 15, color: "#444" }}>
+                  {selectedMeet?.organizer}
+                </Text>
+              </View>
+
+              {/* Title */}
+              <Text
+                style={{ fontSize: 22, fontWeight: "700", marginBottom: 4 }}
+              >
+                {selectedMeet?.title}
               </Text>
-            </TouchableOpacity>
+
+              {/* Date */}
+              <Text style={{ fontSize: 16, color: "#666" }}>
+                {selectedMeet?.date}
+              </Text>
+
+              {/* Description */}
+              <Text
+                style={{
+                  marginTop: 10,
+                  fontSize: 15,
+                  color: "#555",
+                  lineHeight: 20,
+                }}
+              >
+                {selectedMeet?.description}
+              </Text>
+
+              {/* Close button */}
+              <TouchableOpacity
+                onPress={() => setSelectedMeet(null)}
+                style={{
+                  marginTop: 22,
+                  backgroundColor: "#000",
+                  paddingVertical: 14,
+                  borderRadius: 12,
+                }}
+              >
+                <Text
+                  style={{ color: "#fff", textAlign: "center", fontSize: 16 }}
+                >
+                  Close
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </Modal>
