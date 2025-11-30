@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { Modal } from "react-native";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MapView, { Marker } from "react-native-maps";
 import { Ionicons } from "@expo/vector-icons";
@@ -86,9 +86,10 @@ function createMockMeets(center) {
       time: `${randomHour}:${randomMinute}`,
       date: `Today at ${randomHour}:${randomMinute}`,
       description: descriptions[index % descriptions.length],
-      organizer: "Shamikh", // mock organizer name
+      organizer: "Shift Inc.", // mock organizer name
       organizerPhoto: "https://i.pravatar.cc/300?img=12", // profile pic placeholder
-      image: "https://images.unsplash.com/photo-1549921296-3a6b44e2a9b8", // CAR PHOTO
+      image:
+        "https://bangshift.com/wp-content/uploads/2017/01/kelly-python1.jpg", // CAR PHOTO
       latitude: baseLat + o.dy,
       longitude: baseLng + o.dx,
     };
@@ -230,14 +231,14 @@ export default function MeetResultsScreen() {
             }}
           >
             {/* Car Photo */}
-            {/* <Image
+            <Image
               source={{ uri: selectedMeet?.image }}
               style={{
                 width: "100%",
                 height: 260,
               }}
               resizeMode="cover"
-            /> */}
+            />
 
             {/* Content */}
             <View style={{ padding: 20 }}>
@@ -249,7 +250,7 @@ export default function MeetResultsScreen() {
                   marginBottom: 10,
                 }}
               >
-                {/* <Image
+                <Image
                   source={{ uri: selectedMeet?.organizerPhoto }}
                   style={{
                     width: 40,
@@ -257,7 +258,7 @@ export default function MeetResultsScreen() {
                     borderRadius: 20,
                     marginRight: 10,
                   }}
-                /> */}
+                />
                 <Text style={{ fontSize: 15, color: "#444" }}>
                   {selectedMeet?.organizer}
                 </Text>
@@ -292,7 +293,7 @@ export default function MeetResultsScreen() {
                 onPress={() => setSelectedMeet(null)}
                 style={{
                   marginTop: 22,
-                  backgroundColor: "#000",
+                  backgroundColor: "#0B1C3D",
                   paddingVertical: 14,
                   borderRadius: 12,
                 }}
@@ -330,7 +331,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: 96,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#0B1C3D",
     shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowRadius: 12,
