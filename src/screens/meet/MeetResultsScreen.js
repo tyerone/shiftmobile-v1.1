@@ -68,6 +68,15 @@ function createMockMeets(center) {
     "Morning coffee run",
   ];
 
+  const images = [
+    "https://bangshift.com/wp-content/uploads/2017/01/kelly-python1.jpg",
+    "https://s3.us-west-2.amazonaws.com/static.roadstr.io/web/article-sunsetgt/main2.jpg",
+    "https://i.ytimg.com/vi/I2c_lhDAARI/maxresdefault.jpg",
+    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTRykCetvnGNXMSgi9iXhC-Yvdw-8mhjao4TA&s",
+    "https://cdn.myportfolio.com/eb190473-8c70-4eff-9134-fcdf80d8a2ca/bc930ee7-51e9-4686-b601-8bda99bd7c84_rw_1920.jpg?h=48c4cfa32b271016deb2ca6e3d63530b",
+    "https://cdn.myportfolio.com/eb190473-8c70-4eff-9134-fcdf80d8a2ca/56393b2c-0ec0-400d-8090-8535e2f33118_rw_1920.jpg?h=24966c3022d82310a294ffcc62b79db6",
+  ];
+
   return offsets.map((o, index) => {
     const randomHour = 18 + Math.floor(Math.random() * 4); // between 6–9 PM
     const randomMinute = Math.random() > 0.5 ? "00" : "30";
@@ -89,7 +98,10 @@ function createMockMeets(center) {
       organizer: "Shift Inc.", // mock organizer name
       organizerPhoto: "https://i.pravatar.cc/300?img=12", // profile pic placeholder
       image:
-        "https://bangshift.com/wp-content/uploads/2017/01/kelly-python1.jpg", // CAR PHOTO
+        // "https://bangshift.com/wp-content/uploads/2017/01/kelly-python1.jpg",
+
+        images[index % images.length],
+      // CAR PHOTO
       latitude: baseLat + o.dy,
       longitude: baseLng + o.dx,
     };
