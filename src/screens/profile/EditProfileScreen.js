@@ -52,6 +52,12 @@ export default function EditProfileScreen() {
     {
       uri: "https://cdn.myportfolio.com/eb190473-8c70-4eff-9134-fcdf80d8a2ca/7d5096f0-8e55-40c7-944c-30e702769e04_rw_1920.jpg?h=cf0d48bbdb8a997b66670a4235e98ef7",
     },
+    {
+      uri: "https://4kwallpapers.com/images/wallpapers/mazda-rx-7-jdm-cars-2880x1800-14648.jpg",
+    },
+    {
+      uri: "https://www.hdwallpapers.in/download/miata_jdm_car_4k_hd_jdm-3840x2160.jpg",
+    },
   ];
 
   useEffect(() => {
