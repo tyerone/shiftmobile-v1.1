@@ -156,7 +156,15 @@ export default function ProfileScreen() {
         </View>
 
         <View style={styles.headerRow}>
-          <View style={styles.avatar} />
+          {profile?.profileImage ? (
+            <Image
+              source={{ uri: profile.profileImage }}
+              style={styles.avatar}
+            />
+          ) : (
+            <View style={styles.avatar} />
+          )}
+
           <View style={styles.statsRow}>
             <View style={styles.statBlock}>
               <Text style={styles.statNumber}>{spotsCount}</Text>

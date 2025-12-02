@@ -142,7 +142,7 @@ export default function EditProfileScreen() {
         {/* Profile Photo Section */}
         <View style={styles.photoSection}>
           {profileImage ? (
-            <Image source={profileImage} style={styles.avatar} />
+            <Image source={{ uri: profileImage }} style={styles.avatar} />
           ) : (
             <View style={styles.avatar} />
           )}
@@ -163,7 +163,7 @@ export default function EditProfileScreen() {
                   <TouchableOpacity
                     key={index}
                     onPress={() => {
-                      setProfileImage(img);
+                      setProfileImage(img.uri);
                       setModalVisible(false);
                     }}
                   >
