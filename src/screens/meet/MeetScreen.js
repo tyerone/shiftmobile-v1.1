@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 8,
     paddingBottom: 12,
-    backgroundColor: "#0B1C3D",
+    backgroundColor: "#fff",
   },
   searchPill: {
     height: 52,

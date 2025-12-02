@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5,
     padding: 10,
     borderBottomColor: "#e5e7eb",
-    backgroundColor: "#0B1C3D",
+    backgroundColor: "#fff",
   },
   tabItem: {
     flex: 1,
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     color: "#9ca3af",
   },
   tabLabelActive: {
-    color: "#ffffff",
+    color: "#000",
   },
   indicator: {
     marginTop: 4,
@@ -107,8 +107,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    // backgroundColor: "#0B1C3D",
-    backgroundColor: "#E10600",
+    backgroundColor: "#0B1C3D",
     alignItems: "center",
     justifyContent: "center",
     marginHorizontal: 8,
